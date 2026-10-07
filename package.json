@@ -1,0 +1,16 @@
+{
+  "name": "car-rental",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "npm run dev --prefix Client",
+    "dev": "npm run dev --prefix Client",
+    "server": "npm run server --prefix server",
+    "server:start": "npm start --prefix server",
+    "build": "npm run build --prefix Client",
+    "preview": "npm run preview --prefix Client"
+  },
+  "dependencies": {
+    "react-router-dom": "^7.18.3"
+  }
+}
