@@ -5,15 +5,42 @@ import { dummyCarData } from '../assets/assets'
 
 export const AppContext = createContext()
 
+// Safe localStorage access for mobile browsers / private browsing mode
+const safeGetItem = (key) => {
+  try {
+    return localStorage.getItem(key)
+  } catch {
+    return null
+  }
+}
+
+const safeSetItem = (key, val) => {
+  try {
+    localStorage.setItem(key, val)
+  } catch (err) {
+    console.warn('Storage write skipped (private mode or quota):', err)
+  }
+}
+
+const safeRemoveItem = (key) => {
+  try {
+    localStorage.removeItem(key)
+  } catch {
+    // ignore
+  }
+}
+
 const AppContextProvider = (props) => {
   const currency = import.meta.env.VITE_CURRENCY || '$'
-  const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000'
+  // Clean backend URL to strip any trailing slashes and normalize
+  const rawBackendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000'
+  const backendUrl = rawBackendUrl.replace(/\/+$/, '')
 
-  // Validate initial token structure
+  // Validate initial token structure safely
   const [token, setToken] = useState(() => {
-    const saved = localStorage.getItem('token')
+    const saved = safeGetItem('token')
     if (saved && (!saved.includes('.') || saved.startsWith('token_') || saved.length < 20)) {
-      localStorage.removeItem('token')
+      safeRemoveItem('token')
       return false
     }
     return saved || false
@@ -52,14 +79,14 @@ const AppContextProvider = (props) => {
         setUserData(data.user)
       } else {
         // Token is rejected or user not found
-        localStorage.removeItem('token')
+        safeRemoveItem('token')
         setToken(false)
         setUserData(false)
-        toast.info('Session expired or user not found. Please login again.')
+        toast.info('Session expired. Please login again.')
       }
     } catch (error) {
       if (error.response?.status === 401 || error.response?.status === 403 || error.response?.status === 404) {
-        localStorage.removeItem('token')
+        safeRemoveItem('token')
         setToken(false)
         setUserData(false)
         toast.info('Your session has expired. Please log in again.')
@@ -88,7 +115,7 @@ const AppContextProvider = (props) => {
       // Token verification failed
     }
 
-    localStorage.removeItem('token')
+    safeRemoveItem('token')
     setToken(false)
     setUserData(false)
     return false
@@ -96,7 +123,7 @@ const AppContextProvider = (props) => {
 
   // Logout Handler
   const logout = () => {
-    localStorage.removeItem('token')
+    safeRemoveItem('token')
     setToken(false)
     setUserData(false)
     toast.info('Logged out successfully')
@@ -107,8 +134,8 @@ const AppContextProvider = (props) => {
     const interceptor = axios.interceptors.response.use(
       (response) => response,
       (error) => {
-        if (error.response?.status === 401 && localStorage.getItem('token')) {
-          localStorage.removeItem('token')
+        if (error.response?.status === 401 && safeGetItem('token')) {
+          safeRemoveItem('token')
           setToken(false)
           setUserData(false)
           toast.info('Authentication expired. Please log in again.')

@@ -212,6 +212,29 @@ npm run dev
 
 ---
 
+## 🌐 Production Deployment Guide
+
+When deploying DriveEase for live production access (especially on mobile devices):
+
+### 1. Backend Deployment (Render / Railway)
+1. Deploy the `server/` directory as a Node.js web service.
+2. In your backend environment settings, configure:
+   * `PORT=4000` (or host provided port)
+   * `MONGODB_URI` (MongoDB Atlas connection string)
+   * `JWT_SECRET`
+   * `SMTP_*` and `IMAGEKIT_*` keys
+3. Once deployed, note down your live HTTPS API URL (e.g. `https://driveease-api.onrender.com`).
+
+### 2. Frontend Deployment (Vercel / Netlify)
+1. Deploy the `Client/` directory.
+2. **CRITICAL FOR MOBILE ACCESS:** In the Vercel/Netlify Dashboard under **Settings > Environment Variables**, add:
+   * `VITE_BACKEND_URL` = `https://your-deployed-backend-url.com` *(MUST be HTTPS to prevent mobile browser mixed-content blocks)*
+   * `VITE_CURRENCY` = `$`
+3. Re-deploy the frontend build so the production bundle points directly to your live API.
+
+
+---
+
 ## 🌐 Default Ports & Access Points
 
 | Service | URL | Description |

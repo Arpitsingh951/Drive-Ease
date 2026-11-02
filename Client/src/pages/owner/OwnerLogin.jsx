@@ -13,12 +13,22 @@ const OwnerLogin = () => {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
 
+  const safeSetItem = (key, value) => {
+    try {
+      localStorage.setItem(key, value)
+    } catch {
+      // ignore
+    }
+  }
+
   const handleAdminLogin = async (e) => {
     e.preventDefault()
     setLoading(true)
 
+    const cleanBaseUrl = (backendUrl || '').replace(/\/+$/, '')
+
     try {
-      const { data } = await axios.post(`${backendUrl}/api/user/login`, {
+      const { data } = await axios.post(`${cleanBaseUrl}/api/user/login`, {
         email: email.trim().toLowerCase(),
         password: password.trim()
       })
@@ -30,7 +40,7 @@ const OwnerLogin = () => {
           return
         }
 
-        localStorage.setItem('token', data.token)
+        safeSetItem('token', data.token)
         setToken(data.token)
         setUserData(data.user)
         toast.success(`Welcome back, ${data.user.name}! (Admin Access Granted)`)
@@ -43,7 +53,7 @@ const OwnerLogin = () => {
         toast.error(error.response.data.message)
       } else {
         // Offline demo admin login fallback
-        if (email === 'admin@driveease.com' && password === 'admin123') {
+        if (email.trim().toLowerCase() === 'admin@driveease.com' && password.trim() === 'admin123') {
           const demoAdmin = {
             _id: 'admin_demo_123',
             name: 'DriveEase Admin',
@@ -51,7 +61,7 @@ const OwnerLogin = () => {
             role: 'owner'
           }
           const demoToken = 'demo_admin_token_' + Date.now()
-          localStorage.setItem('token', demoToken)
+          safeSetItem('token', demoToken)
           setToken(demoToken)
           setUserData(demoAdmin)
           toast.success('Admin login successful (Demo Mode)')
@@ -99,6 +109,11 @@ const OwnerLogin = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder='admin@driveease.com'
+              autoCapitalize='none'
+              autoCorrect='off'
+              spellCheck='false'
+              inputMode='email'
+              autoComplete='email'
               required
               className='w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white placeholder-slate-500 outline-none focus:border-blue-500 transition-colors'
             />
@@ -113,6 +128,10 @@ const OwnerLogin = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder='••••••••'
+              autoCapitalize='none'
+              autoCorrect='off'
+              spellCheck='false'
+              autoComplete='current-password'
               required
               className='w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white placeholder-slate-500 outline-none focus:border-blue-500 transition-colors'
             />

@@ -27,7 +27,7 @@ const App = () => {
 
   return (
     <>
-      <ToastContainer position='top-right' autoClose={3000} />
+      <ToastContainer position='top-center' autoClose={3000} style={{ zIndex: 99999 }} />
       {showLogin && <Login setShowLogin={setShowLogin} />}
       {!isOwnerPath && <Navbar setShowLogin={setShowLogin} />}
 
