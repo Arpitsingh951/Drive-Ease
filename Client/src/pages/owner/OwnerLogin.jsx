@@ -19,8 +19,8 @@ const OwnerLogin = () => {
 
     try {
       const { data } = await axios.post(`${backendUrl}/api/user/login`, {
-        email,
-        password
+        email: email.trim().toLowerCase(),
+        password: password.trim()
       })
 
       if (data.success) {

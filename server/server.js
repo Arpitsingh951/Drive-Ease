@@ -1,6 +1,6 @@
+import './configs/env.js'
 import express from 'express'
 import cors from 'cors'
-import 'dotenv/config'
 import connectDB from './configs/mongodb.js'
 import userRouter from './routes/userRoute.js'
 import carRouter from './routes/carRoute.js'

@@ -12,6 +12,8 @@ const Owner = () => {
     // Check if user is logged in as an owner or admin
     if (!token) {
       navigate('/owner/login')
+    } else if (userData && userData.role !== 'owner') {
+      navigate('/')
     }
   }, [token, userData, navigate])
 
